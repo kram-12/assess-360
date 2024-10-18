@@ -2,6 +2,43 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <?php
+        if (isset($_POST['login'])) {
+            if (isset($_POST['usertype']) && isset($_POST['email']) && isset($_POST['pass'])) {        
+                require_once 'sql.php';
+                $conn = mysqli_connect($host, $user, $ps, $project);if (!$conn) {
+                    echo "<script>alert(\"Database Error! Retry after some time!\")</script>";
+                }
+                $type = mysqli_real_escape_string($conn, $_POST['usertype']);
+                $email = mysqli_real_escape_string($conn, $_POST['email']);
+                $password = mysqli_real_escape_string($conn, $_POST['pass']);
+                $password = crypt($password, 'kalyanrampoonamalli');
+                $sql = "select * from login_details where email='{$email}'";
+                $res =   mysqli_query($conn, $sql);
+                if ($res == true) {
+                    global $dbmail, $dbpass;
+                    while ($row = mysqli_fetch_array($res)) {
+                        $dbpass = $row['pass'];
+                        $dbmail = $row['email'];
+                        $_SESSION["name"] = $row['name'];
+                        $_SESSION["type"] = $type;
+                        $_SESSION["email"] = $dbmail;
+                    }
+                    if ($dbpass === $password) {
+                        if ($type === 'student') {
+                            header("location:student_home.php");
+                        } elseif ($type === 'faculty') {
+                            header("Location:faculty_home.php");
+                        }
+                    } elseif ($dbpass !== $password && $dbmail === $email) {
+                        echo "<script>alert('Incorrect Password');</script>";
+                    } elseif ($dbpass !== $password && $dbmail !== $email) {
+                        echo "<script>alert('E-mail Not Found In Database');</script>";
+                    }
+                }
+            }
+        }
+        ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- ===== CSS ===== -->
