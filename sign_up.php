@@ -3,7 +3,140 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
+    <?php
+function validatePassword($password) {
+  if (strlen($password) < 8) {
+      return false;
+  }
+  if (!preg_match('/[A-Z]/', $password)) {
+      return false;
+  }
+  if (!preg_match('/[a-z]/', $password)) {
+      return false;
+  }
+  if (!preg_match('/[^\w]/', $password)) {
+      return false;
+  }
+  if (!preg_match('/[0-9]/', $password)) {
+      return false;
+  }
+  return true;
+}
+
+if (isset($_POST['studsu'])) {
+    session_start();
+    if (isset($_POST['name1']) && isset($_POST['reg1']) && isset($_POST['email1']) && isset($_POST['phno1']) && isset($_POST['dept1']) && isset($_POST['dob1']) && isset($_POST['gender1']) && isset($_POST['password1']) && isset($_POST['cpassword1'])) {
+        require_once 'sql.php';
+        $conn = mysqli_connect($host, $user, $ps, $project);       
+        if (!$conn) {
+            echo "<script>alert(\"Database Error! Retry after some time!\")</script>";
+        }
+        $name1 = mysqli_real_escape_string($conn, $_POST['name1']);
+        $reg1 = mysqli_real_escape_string($conn, $_POST['reg1']);
+        $email1 = mysqli_real_escape_string($conn, $_POST['email1']);
+        $phno1 = mysqli_real_escape_string($conn, $_POST['phno1']);
+        $dept1 = mysqli_real_escape_string($conn, $_POST['dept1']);
+        $dob1 = mysqli_real_escape_string($conn, $_POST['dob1']);
+        $gender1 = mysqli_real_escape_string($conn, $_POST['gender1']);
+        $password1 = mysqli_real_escape_string($conn, $_POST['password1']);
+        $cpassword1 = mysqli_real_escape_string($conn, $_POST['cpassword1']);
+        if(!validatePassword($password1)){
+          echo "<script>
+                alert('Invalid Password!');
+                window.location.replace(\"sign_up.php\");</script>";
+            session_destroy();
+        }
+        $password1 = crypt($password1,'kalyanrampoonamalli');
+        $cpassword1 = crypt($cpassword1,'kalyanrampoonamalli');
+        if ($password1 == $cpassword1) {
+            $sql = "insert into login_details(email,pass)values('$email1','$password1');";
+            if (mysqli_query($conn, $sql)) {
+                $sql2 = "insert into student (reg_no,name,email,ph_no,dept,gender,dob) values('$reg1','$name1','$email1','$phno1','$dept1','$gender1','$dob1')";
+                if (mysqli_query($conn, $sql2)) {
+                echo "<script>
+                alert('Successfully Signed Up!');
+                window.location.replace(\"index.php\");</script>";
+                session_destroy();
+                }
+                else{
+                  echo "<script>
+                alert('Unknown Error, Try again Later!');
+                window.location.replace(\"index.php\");</script>";
+                session_destroy();
+                }
+            } else {
+                echo "<script>
+                alert('User details already exists in Database!');
+                window.location.replace(\"index.php\");</script>";
+                session_destroy();
+            }
+        } else {
+            echo "<script>
+                alert('Password not matched!');
+                window.location.replace(\"sign_up.php\");</script>";
+            session_destroy();
+        }
+    }
+}
+
+if (isset($_POST['facultysu'])) {
+    session_start();
+    if (isset($_POST['name2']) && isset($_POST['faculty_id']) && isset($_POST['mail2']) && isset($_POST['phno2']) && isset($_POST['dept2']) && isset($_POST['dob2']) && isset($_POST['gender2']) && isset($_POST['password2']) && isset($_POST['cpassword2'])) {
+require 'sql.php';
+        $conn = mysqli_connect($host, $user, $ps, $project);        
+        if (!$conn) {
+            echo "<script>alert(\"Database Error! Retry after some time!\")</script>";
+        }
+        $name2 = mysqli_real_escape_string($conn, $_POST['name2']);
+        $usn2 = mysqli_real_escape_string($conn, $_POST['faculty_id']);
+        $mail2 = mysqli_real_escape_string($conn, $_POST['mail2']);
+        $phno2 = mysqli_real_escape_string($conn, $_POST['phno2']);
+        $dept2 = mysqli_real_escape_string($conn, $_POST['dept2']);
+        $dob2 = mysqli_real_escape_string($conn, $_POST['dob2']);
+        $gender2 = mysqli_real_escape_string($conn, $_POST['gender2']);
+        $password2 = mysqli_real_escape_string($conn, $_POST['password2']);
+        $cpassword2 = mysqli_real_escape_string($conn, $_POST['cpassword2']);
+        if(validatePassword($password2)){
+          echo "<script>
+                alert('Invalid Password!');
+                window.location.replace(\"sign_up.php\");</script>";
+            session_destroy();
+        }
+        $password2 = crypt($password2,'kalyanrampoonamalli');
+        $cpassword2 = crypt( $cpassword2,'kalyanrampoonamalli');
+        if ($password2 == $cpassword2 && validatePassword($password2)) {
+            $sql = "insert into login_details(email,pass)values('$mail2','$password2');";
+            if (mysqli_query($conn, $sql)) {
+                $sql2 = "insert into faculty (faculty_id,name,email,ph_no,dept,gender,dob) values('$usn2','$name2','$mail2','$phno2','$dept2','$gender2','$dob2')";
+                if (mysqli_query($conn, $sql2)) {
+                echo "<script>
+                alert('Successfully Signed Up!');
+                window.location.replace(\"index.php\");</script>";
+                session_destroy();
+                }
+                else{
+                  echo "<script>
+                alert('Unknown Error, Try again Later!');
+                window.location.replace(\"index.php\");</script>";
+                session_destroy();
+                }
+            } else {
+                echo "<script>
+                alert('User details already exists in database');
+                window.location.replace(\"index.php\");</script>";
+                session_destroy();
+            }
+        } else {
+            echo "<script>
+                alert('Password not matched!');
+                window.location.replace(\"signup.php\");</script>";
+            session_destroy();
+        }
+    }
+}
+?>
+
     <!-- ===== CSS ===== -->
     <style>
       /*===== GOOGLE FONTS =====*/
